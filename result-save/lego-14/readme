@@ -1,0 +1,2 @@
+model :（loss:0.02/0.02/1/5）   (排除底下磚塊連結)（debug:5001）
+model2:（loss:0.02/0.02/1/5/1）(排除底下磚塊連結)(新增connection loss)（debug:5002）
