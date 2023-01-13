@@ -8,9 +8,7 @@
 dataset/
 data/
 debug/
-unity_use/contour.txt
-unity_use/new_node_pos.txt
-unity_use/node_pos_test.txt
+unity_use/
 
 
 # 忽略所有 db 目錄下附檔名是 .sqlite3 的檔案
