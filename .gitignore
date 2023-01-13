@@ -7,6 +7,9 @@
 # config/database.yml
 dataset/
 data/
+debug/
+unity_use/
+
 
 # 忽略所有 db 目錄下附檔名是 .sqlite3 的檔案
 # /db/*.sqlite3
