@@ -19,3 +19,4 @@ unity_use/
 
 # 當然你要忽略自己也可以，只是通常不會這麼做
 # .gitignore
+D-map/models/model-f6b98070.onnx
