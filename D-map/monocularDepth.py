@@ -6,8 +6,8 @@ import time
 path_model = "models/"
 
 # Read Network
-model_name = "model-f6b98070.onnx"; # MiDaS v2.1 Large
-#model_name = "model-small.onnx"; # MiDaS v2.1 Small
+# model_name = "model-f6b98070.onnx"; # MiDaS v2.1 Large
+model_name = "model-small.onnx"; # MiDaS v2.1 Small
 
 
 # Load the DNN model
@@ -29,10 +29,10 @@ img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 # Create Blob from Input Image
 # MiDaS v2.1 Large ( Scale : 1 / 255, Size : 384 x 384, Mean Subtraction : ( 123.675, 116.28, 103.53 ), Channels Order : RGB )
-blob = cv2.dnn.blobFromImage(img, 1/255., (384,384), (123.675, 116.28, 103.53), True, False)
+# blob = cv2.dnn.blobFromImage(img, 1/255., (384,384), (123.675, 116.28, 103.53), True, False)
 
 # MiDaS v2.1 Small ( Scale : 1 / 255, Size : 256 x 256, Mean Subtraction : ( 123.675, 116.28, 103.53 ), Channels Order : RGB )
-#blob = cv2.dnn.blobFromImage(img, 1/255., (256,256), (123.675, 116.28, 103.53), True, False)
+blob = cv2.dnn.blobFromImage(img, 1/255., (256,256), (123.675, 116.28, 103.53), True, False)
 
 # Set input to the model
 model.setInput(blob)
