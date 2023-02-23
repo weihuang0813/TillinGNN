@@ -89,17 +89,17 @@ def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所�
     # print("tiles = ",tiles)
     # print("\n\n\n\n\n\n\n\n")
 
-    # tiles_tmp = copy.deepcopy(tiles)
+    tiles_tmp = copy.deepcopy(tiles)
     # print(tiles) # ('yellow', array([[2.5 , 0.9 ],[2.5 , 1.2 ],[2.75, 0.9 ],[2.5 , 0.9 ]]} 鋪磚狀況無顏色
-    # for i in range(len(tiles_tmp)):
-    #     tiles_tmp[i] = list(tiles_tmp[i])
-    #     tiles_tmp[i].append("false") # init紀錄有沒有找過
-    #     tiles_tmp[i][1][:,0] = tiles_tmp[i][1][:,0] * zoom + move_x # for why tiles & tiles-tmp 都一起被改了
-    #     tiles_tmp[i][1][:,1] = tiles_tmp[i][1][:,1] * zoom + move_y
+    for i in range(len(tiles_tmp)):
+        tiles_tmp[i] = list(tiles_tmp[i])
+        tiles_tmp[i].append("false") # init紀錄有沒有找過
+        tiles_tmp[i][1][:,0] = tiles_tmp[i][1][:,0] * zoom + move_x # for why tiles & tiles-tmp 都一起被改了
+        tiles_tmp[i][1][:,1] = tiles_tmp[i][1][:,1] * zoom + move_y
 
     # print("tiles = ",tiles)
     # print("\n\n\n\n\n\n\n\n")
-    # print("tiles_tmp = ",tiles_tmp)
+    print("tiles_tmp = ",tiles_tmp)
 
     for i in range(len(tiles)):
         #print("#######################")

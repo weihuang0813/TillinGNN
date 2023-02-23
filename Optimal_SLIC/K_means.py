@@ -10,11 +10,11 @@ lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
 
 # 建立一個二值化的區域 mask
 mask = np.zeros(img.shape[:2], dtype=np.uint8)
-pts = np.array([[100, 100], [200, 100], [150, 200]])
+# pts = np.array([[50, 100], [200, 100], [200, 250], [50, 200]])
+pts = np.array([[150, 100], [200, 100], [200, 150], [150, 150]])
 cv2.drawContours(mask, [pts], -1, (255, 255, 255), -1)
 
 masked_image = cv2.bitwise_and(img, img, mask=mask)
-cv2.imshow('Cropped Image', masked_image)
 
 # 使用 boolean indexing 篩選出區域內的像素值
 region_pixels = lab[mask == 255]
@@ -22,7 +22,7 @@ region_pixels = lab[mask == 255]
 # # 获取切割范围内的颜色
 # cropped_image = lab[280:480, 330:510]
 # # colors = img[mask > 0].reshape(-1, 3)
-# colors = cropped_image.reshape(-1, 3)
+# colors = cropped_image.reshape(-1, 3)                         
 
 # 使用 k-means 聚合颜色
 # kmeans = KMeans(n_clusters=3, random_state=0).fit(colors)
@@ -55,6 +55,7 @@ cv2.rectangle(canvas, (0, 0), (300, 300), (int(bgr_pixel[0][0]), int(bgr_pixel[0
 # 保存处理后的图像
 # cv2.imwrite('new_dog1.png', new_img)
 # cv2.imshow("new_img", new_img)
+cv2.imshow('Cropped Image', masked_image)
 cv2.imshow("img", img)
 cv2.imshow("Square", canvas)
 cv2.waitKey(0)
