@@ -2,6 +2,8 @@ import numpy as np
 import math
 import cv2 
 import os
+from sklearn.cluster import KMeans
+from sklearn.metrics import pairwise_distances_argmin_min, silhouette_score, calinski_harabasz_score
 from fast_slic import Slic
 from shapely.geometry import Point, Polygon
 import copy
@@ -56,7 +58,7 @@ def calculation_of_transform (file_name, original_contour): #計算從gui介面�
             
     return trans
 
-def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所有像素點顏色
+def color_catch_allen_wang(trans, file_name, tiles): #抓取原圖中指定範圍內的所有像素點顏色
     
     img_name = file_name[:-4]
     png = [".jpeg", ".png", ".jpg", ".PNG", ".JPG"]
@@ -93,7 +95,7 @@ def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所�
     # print(tiles) # ('yellow', array([[2.5 , 0.9 ],[2.5 , 1.2 ],[2.75, 0.9 ],[2.5 , 0.9 ]]} 鋪磚狀況無顏色
     for i in range(len(tiles_tmp)):
         tiles_tmp[i] = list(tiles_tmp[i])
-        tiles_tmp[i].append("false") # init紀錄有沒有找過
+        # tiles_tmp[i].append("false") # init紀錄有沒有找過
         tiles_tmp[i][1][:,0] = tiles_tmp[i][1][:,0] * zoom + move_x # for why tiles & tiles-tmp 都一起被改了
         tiles_tmp[i][1][:,1] = tiles_tmp[i][1][:,1] * zoom + move_y
 
@@ -250,11 +252,168 @@ def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所�
     # print("tiles_color = ",tiles_color)
     # print("tiles_color.len = ",len(tiles_color))
     # print("tiles_color = ",tiles_color)
-    # print("tiles_color[1] = ",tiles_color[1]) # [237 245 248]
+    print("tiles_color[1] = ",tiles_color[1]) # [237 245 248]
+    print("type(tiles_color[1]) = ",type(tiles_color[1])) # [237 245 248]
     print("len(tiles) = ",len(tiles))
+    # cv2.imshow("img",img)
 
 
     return tiles_color
+
+def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所有像素點顏色
+    
+    img_name = file_name[:-4]
+    png = [".jpeg", ".png", ".jpg", ".PNG", ".JPG"]
+    find_file = False
+    img = []
+    for i in range(len(png)):
+        if os.path.exists(img_name + png[i]):
+            if os.path.isfile(img_name + png[i]):
+                img = cv2.imread(img_name  + png[i])
+
+                # 将图像转换为 LAB 空间
+                lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+                
+                # image = cv2.imread(img_name + png[i])
+
+                # slic = Slic(num_components=2000, compactness=150,subsample_stride=1,debug_mode=True)
+                # assignment = slic.iterate(image) # Cluster Map
+                # temp = slic.slic_model.clusters # The cluster information of superpixels.
+
+                find_file = True
+    if(find_file == False):
+        print("no file")
+
+    zoom = trans[0]
+    move_x = trans[1]
+    move_y = trans[2]
+    tiles_color = []
+    tiles_tmp = [] # tiles 轉換資料型態成 list
+    # tiles_tmp.append(list(tiles))
+    # print("tiles = ",tiles)
+    # print("\n\n\n\n\n\n\n\n")
+
+    tiles_tmp = copy.deepcopy(tiles)
+    # print(tiles) # ('yellow', array([[2.5 , 0.9 ],[2.5 , 1.2 ],[2.75, 0.9 ],[2.5 , 0.9 ]]} 鋪磚狀況無顏色
+    for i in range(len(tiles_tmp)):
+        tiles_tmp[i] = list(tiles_tmp[i])
+        # tiles_tmp[i].append("false") # init紀錄有沒有找過
+        tiles_tmp[i][1][:,0] = tiles_tmp[i][1][:,0] * zoom + move_x # for why tiles & tiles-tmp 都一起被改了
+        tiles_tmp[i][1][:,1] = tiles_tmp[i][1][:,1] * zoom + move_y
+        # print(tiles_tmp[i][1]) # [[660.94005427 394.35479746] [660.94005427 426.79128225] [687.97045827 394.35479746] [660.94005427 394.35479746]]
+
+        # # 計算資料集合的中心點
+        # center = np.mean(tiles_tmp[i][1], axis=0)
+
+        # # 將資料集合的每個點都放大兩倍
+        # data_scaled = (tiles_tmp[i][1] - center) * 1.1 + center  
+
+        # 建立一個二值化的區域 mask
+        mask = np.zeros(img.shape[:2], dtype=np.uint8)
+        pts = np.array(tiles_tmp[i][1]).astype(int)
+        cv2.drawContours(mask, [pts], -1, (255, 255, 255), -1)
+
+        masked_image = cv2.bitwise_and(img, img, mask=mask)
+
+        # 使用 boolean indexing 篩選出區域內的像素值
+        region_pixels = img[mask == 255]                      
+
+        # 使用 k-means 聚合颜色
+        kmeans = KMeans(n_clusters=10, random_state=0, init='k-means++').fit(region_pixels)
+
+
+        # # 計算每個label的Silhouette Score
+        # silhouette_scores = []
+        # for i in range(5):
+        #     silhouette_scores.append(silhouette_score(region_pixels, kmeans.labels_))
+        #     print("silhouette_scores",silhouette_scores)
+        #     # 如果所有樣本都屬於同一個聚類，則直接跳出迴圈
+        #     if len(np.unique(kmeans.labels_)) == 1:
+        #         break
+
+        # 找出最大的Silhouette Score所對應的label
+        # best_label = silhouette_scores.index(max(silhouette_scores))
+
+        # # 计算每个点到其所属质心的距离平方和
+        cluster_centers = kmeans.cluster_centers_
+        distances = pairwise_distances_argmin_min(region_pixels, cluster_centers)
+        sse = sum(distances[1])
+
+        # 选择最小的SSE对应的标签
+        best_label = kmeans.labels_[distances[0][np.argmin(distances[1])]]
+        # best_label = get_best_label(region_pixels, 5, metric='silhouette')
+
+        # 返回n個聚合過後的顏色值
+        # 将图像转换回 BGR 空间
+        bgr_pixel = cv2.cvtColor(np.uint8([cluster_centers]), cv2.COLOR_LAB2BGR)[0] # 下次看要不要改成不要轉成lab顏色空間
+        print("bgr_pixel = ",bgr_pixel)
+        print("bgr_pixel[best_label] = ",bgr_pixel[best_label])
+
+        # # 找到每個元素的計數
+        # unique_elements, counts = np.unique(bgr_pixel, axis=0, return_counts=True)
+
+        # # 找到最大計數所對應的元素
+        # most_common_element = unique_elements[np.argmax(counts)]
+
+        tiles_color.append(bgr_pixel[best_label])
+
+        # 建立一個黑色畫布
+        canvas = np.zeros((300, 300, 3), dtype=np.uint8)
+
+        # 使用 cv2.rectangle 函數畫正方形
+        cv2.rectangle(canvas, (0, 0), (300, 300), (int(bgr_pixel[best_label][0]), int(bgr_pixel[best_label][1]), int(bgr_pixel[best_label][2])), thickness=-1)
+        
+        # cv2.imshow('Cropped Image', masked_image)
+        # cv2.imshow("Square", canvas)
+        # cv2.waitKey(0)
+    
+    # print("tiles_color = ",tiles_color)
+    # print("tiles_color.len = ",len(tiles_color))
+    # print("tiles_color = ",tiles_color)
+    # print("tiles_color[1] = ",tiles_color[1]) # [237 245 248]
+    # print("type(tiles_color[1]) = ",type(tiles_color[1])) # [237 245 248]
+    # print("len(tiles) = ",len(tiles))
+    # print("len(tiles_color) = ",len(tiles_color))
+
+
+    return tiles_color
+
+def get_best_label(X, max_k, metric='silhouette'):
+    """
+    根據指定的距離度量（silhouette_score或calinski_harabasz_score），
+    從不同的聚類數目中選擇最佳的聚類數目。
+
+    Parameters
+    ----------
+    X : array-like
+        輸入的資料，形狀為 (n_samples, n_features)。
+    max_k : int
+        可能的最大聚類數目。
+    metric : str
+        聚類品質評估的度量方法。可選值有 'silhouette' 和 'calinski_harabasz'。
+
+    Returns
+    -------
+    best_label : array-like
+        最佳的聚類結果。
+
+    """
+    best_score = -np.inf
+    best_label = None
+    for k in range(2, max_k+1):
+        kmeans = KMeans(n_clusters=k)
+        kmeans.fit(X)
+        labels = kmeans.labels_
+        if len(set(labels)) == 1:
+            break
+        if metric == 'silhouette':
+            score = silhouette_score(X, labels)
+        elif metric == 'calinski_harabasz':
+            score = calinski_harabasz_score(X, labels)
+        if score > best_score:
+            best_score = score
+            best_label = labels
+    return best_label
 
 def find_lego_color(most_color):
 

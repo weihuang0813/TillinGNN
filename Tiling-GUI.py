@@ -203,11 +203,11 @@ class DrawerWidgets(QMainWindow):
 
 
         shape = LineString(shape)
-        print(f'before : {np.array(shape.coords)}')
+        # print(f'before : {np.array(shape.coords)}') # before : [[-0.12673017 -2.32322932] [-0.13636037 -2.31359911] [-0.14599057 -2.31359911] ... [-0.10746977 -2.32322932] [-0.11709997 -2.32322932] [-0.12673017 -2.32322932]]
         shape = scale(shape, scale_rate, scale_rate, origin = center_point)
         shape = rotate(shape, rotation_rate, origin = center_point)
         shape = translate(shape, translation_rate_x, translation_rate_y)
-        print(f'after : {np.array(shape.coords)}')
+        # print(f'after : {np.array(shape.coords)}') # after : [[-0.12160752 -2.27569414] [-0.13104512 -2.26625654] [-0.14048272 -2.26625654] ... [-0.10273233 -2.27569414] [-0.11216993 -2.27569414] [-0.12160752 -2.27569414]]
 
         output_coords = list(np.array(shape.coords))
         return output_coords
