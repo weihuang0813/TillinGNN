@@ -58,7 +58,7 @@ def calculation_of_transform (file_name, original_contour): #計算從gui介面�
             
     return trans
 
-def color_catch_allen_wang(trans, file_name, tiles): #抓取原圖中指定範圍內的所有像素點顏色
+def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所有像素點顏色
     
     img_name = file_name[:-4]
     png = [".jpeg", ".png", ".jpg", ".PNG", ".JPG"]
@@ -260,7 +260,7 @@ def color_catch_allen_wang(trans, file_name, tiles): #抓取原圖中指定範�
 
     return tiles_color
 
-def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所有像素點顏色
+def color_catch_wei(trans, file_name, tiles): #抓取原圖中指定範圍內的所有像素點顏色
     
     img_name = file_name[:-4]
     png = [".jpeg", ".png", ".jpg", ".PNG", ".JPG"]
@@ -316,7 +316,7 @@ def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所�
         masked_image = cv2.bitwise_and(img, img, mask=mask)
 
         # 使用 boolean indexing 篩選出區域內的像素值
-        region_pixels = img[mask == 255]                      
+        region_pixels = lab[mask == 255]                      
 
         # 使用 k-means 聚合颜色
         kmeans = KMeans(n_clusters=10, random_state=0, init='k-means++').fit(region_pixels)
@@ -345,7 +345,9 @@ def color_catch(trans, file_name, tiles): #抓取原圖中指定範圍內的所�
 
         # 返回n個聚合過後的顏色值
         # 将图像转换回 BGR 空间
+        print("cluster_centers = ",cluster_centers)
         bgr_pixel = cv2.cvtColor(np.uint8([cluster_centers]), cv2.COLOR_LAB2BGR)[0] # 下次看要不要改成不要轉成lab顏色空間
+        # bgr_pixel = np.uint8([cluster_centers])[0] # 下次看要不要改成不要轉成lab顏色空間
         print("bgr_pixel = ",bgr_pixel)
         print("bgr_pixel[best_label] = ",bgr_pixel[best_label])
 

@@ -4,7 +4,7 @@ from maxrect import get_intersection, get_maximal_rectangle, rect2poly
 from shapely.geometry import Polygon
 
 # load image and shrink - it's massive
-img = cv2.imread("/media/cglab/CEDCACB9DCAC9D69/TilinGNN-test/silhouette/bg3.png")
+img = cv2.imread("/media/cglab/CEDCACB9DCAC9D69/TilinGNN/silhouette/duck.jpg")
 img = cv2.resize(img, None,fx=1, fy=1, interpolation = cv2.INTER_CUBIC)
 print(type(img))
 # get a blank canvas for drawing contour on and convert img to grayscale
@@ -16,7 +16,7 @@ kernel = np.ones((5,5),np.float32)/25
 img2gray = cv2.filter2D(img2gray,-1,kernel)
 
 # threshold the image and extract contours
-ret,thresh = cv2.threshold(img2gray,250,255,cv2.THRESH_BINARY_INV) ## 顏色二值化（黑色白色） 目的將圖片顏色落差太大的區分開成黑色白色
+ret,thresh = cv2.threshold(img2gray,200,255,cv2.THRESH_BINARY_INV) ## 顏色二值化（黑色白色） 目的將圖片顏色落差太大的區分開成黑色白色
 contours,hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
 # cv2.imshow('img',img)
@@ -151,7 +151,7 @@ cv2.drawContours(canvas, cnt, -1, (0, 255, 0), 3)
 
 cv2.imshow('canvas',canvas)
 k = cv2.waitKey(0)
-f = open("./silhouette/bg3.txt", "w")
+f = open("./silhouette/duck.txt", "w")
 for i in range(len(cnt)):
     if i == len(cnt) - 1:
         f.write(str(cnt[i][0][0]) + " " + str(cnt[i][0][1]) + '\n')
